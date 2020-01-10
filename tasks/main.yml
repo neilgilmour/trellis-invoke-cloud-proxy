@@ -1,2 +1,18 @@
 ---
 # tasks file for trellis-invoke-cloud-proxy
+
+- name: Download the Cloud Proxy if it doesn't already exist.
+    command: wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+    args:
+      chdir: /etc/cloud-sql-proxy/
+      creates: /etc/cloud-sql-proxy/cloud_sql_proxy
+
+- name: Make the proxy executable.
+    command: chmod +x cloud_sql_proxy
+    args:
+      chdir: /etc/cloud-sql-proxy/
+
+- name: Invoke the Cloud SQL Proxy with our instance details
+    command: ./cloud_sql_proxy -instances={{ site_env.cloud_sql_instance_name }}=tcp:{{ site_env.cloud_sql_port }} &
+    args:
+      chdir: /etc/cloud-sql-proxy/
